@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Daftar — CodeShare{% endblock %}
+{% block content %}
+<div class="shell auth-shell">
+  <div class="card form-card">
+    <div class="page-kicker">Create account</div><h1 class="page-title">Daftar</h1><p class="muted">Buat akun untuk menyimpan dan mengelola paste.</p>
+    <div id="error" class="notice notice-error" hidden></div>
+    <form id="signup-form" style="margin-top:22px">
+      <div class="field"><label class="label">Username</label><input class="input" name="username" minlength="3" maxlength="32" pattern="[A-Za-z0-9_.-]+" autocomplete="username" required><span class="help">Huruf, angka, titik, strip, underscore.</span></div>
+      <div class="field"><label class="label">Email</label><input class="input" name="email" type="email" autocomplete="email" required></div>
+      <div class="field"><label class="label">Password</label><input class="input" name="password" type="password" minlength="8" autocomplete="new-password" required><span class="help">Minimal 8 karakter.</span></div>
+      <button class="btn btn-primary btn-block" type="submit">Buat akun</button>
+    </form>
+    <p class="muted" style="text-align:center;margin:18px 0 0">Sudah punya akun? <a href="/login" style="color:#c8c1ff">Masuk</a></p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => document.getElementById('signup-form').addEventListener('submit', async e => {
+  e.preventDefault(); const button = e.submitter; button.disabled = true; button.textContent = 'Membuat akun...'
+  try { const data = await api('/api/signup', { method: 'POST', body: new FormData(e.currentTarget) }); CodeShare.auth.set(data.access_token); location.href = '/dashboard' }
+  catch (error) { const box = document.getElementById('error'); box.hidden = false; box.textContent = error.message; button.disabled = false; button.textContent = 'Buat akun' }
+}))
+</script>
+{% endblock %}

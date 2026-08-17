@@ -1,0 +1,28 @@
+{
+  "name": "codeshare-node22",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Fast CodeShare platform rewritten for Node.js 22+",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "check": "node --check src/server.js && node --check src/store.js && node --check src/security.js && node --check src/realtime.js && node --check src/executor.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "nunjucks": "^3.2.4",
+    "ws": "^8.18.3"
+  }
+}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Users — CodeShare{% endblock %}
+{% block content %}
+<div class="shell">
+  <div class="page-head"><div><div class="page-kicker">Community</div><h1 class="page-title">People who share.</h1></div><div class="search-bar"><input class="input" id="user-search" placeholder="Cari username..."></div></div>
+  <div class="grid grid-3" id="users-grid">
+    {% for user in users %}
+    <article class="card card-hover user-card" data-name="{{ user.username | lower }}">
+      <div class="user-card-top">{% if user.profile_picture %}<img class="avatar" src="{{ user.profile_picture }}" alt="">{% else %}<div class="avatar">{{ user.username | initial }}</div>{% endif %}<div><h3 style="margin:0"><a href="/user/{{ user.username }}">{{ user.username }}</a>{% if user.verified_by_admin %} <span style="color:var(--accent-2)">✓</span>{% endif %}</h3><div class="muted">{{ user.paste_count }} paste · {{ user.followers_count }} followers</div></div></div>
+      <div class="badges">{% for badge in user.badge_details %}<span class="badge" data-badge="{{ badge.key }}">{{ badge.icon }} {{ badge.name }}</span>{% endfor %}</div>
+      <div class="paste-foot"><span>Joined {{ user.created_at | day }}</span><a class="btn btn-sm" href="/user/{{ user.username }}">Profile</a></div>
+    </article>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>document.addEventListener('DOMContentLoaded',()=>document.getElementById('user-search').addEventListener('input',e=>{const q=e.target.value.toLowerCase().trim();document.querySelectorAll('.user-card').forEach(card=>card.hidden=q&&!card.dataset.name.includes(q))}))</script>
+{% endblock %}

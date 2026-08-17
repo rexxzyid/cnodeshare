@@ -1,0 +1,8 @@
+node_modules/
+.env
+data/users/*.json
+data/codes/*.json
+data/threads/*.json
+data/notifications/*.json
+data/profile_pictures/*
+!.gitkeep

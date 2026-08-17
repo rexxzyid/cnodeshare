@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ user.username }} — CodeShare{% endblock %}
+{% block content %}
+<div class="shell">
+  <section class="card profile-head">
+    <div class="profile-main">
+      {% if user.profile_picture %}<img class="avatar avatar-lg" src="{{ user.profile_picture }}" alt="">{% else %}<div class="avatar avatar-lg">{{ user.username | initial }}</div>{% endif %}
+      <div><h1 class="profile-name">{{ user.username }} {% if user.verified_by_admin %}<span style="color:var(--accent-2);font-size:.7em">✓</span>{% endif %}</h1>{% if user.name %}<div class="muted">{{ user.name }}</div>{% endif %}<div class="profile-stats"><span><strong>{{ user.followers_count }}</strong> followers</span><span><strong>{{ user.following_count }}</strong> following</span><span>bergabung {{ user.created_at | day }}</span></div><div class="badges">{% for badge in user.badge_details %}<span class="badge" data-badge="{{ badge.key }}">{{ badge.icon }} {{ badge.name }}</span>{% endfor %}</div></div>
+    </div>
+    <button class="btn btn-primary" id="follow-user" data-user="{{ user.username }}" hidden>Follow</button>
+  </section>
+  <section class="section"><div class="section-head"><div><div class="page-kicker">Public work</div><h2>Paste dari {{ user.username }}</h2></div></div><div class="grid grid-3">{% for paste in pastes %}<a class="card card-hover paste-card" href="/paste/{{ paste.id }}"><div class="paste-meta"><span class="tag">{{ paste.language }}</span></div><h3 class="paste-title">{{ paste.title }}</h3><div class="paste-preview">{{ paste.content | truncate(220) }}</div><div class="paste-foot"><span>{{ paste.created_at | day }}</span><span>◉ {{ paste.views }}</span></div></a>{% else %}<div class="empty" style="grid-column:1/-1"><strong>Belum ada paste publik</strong>User ini belum membagikan paste publik.</div>{% endfor %}</div></section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const me = await CodeShare.auth.me(); const target = {{ user.username | json | safe }}; const button = document.getElementById('follow-user')
+  if (me && me.username !== target) { button.hidden = false; try { const state = await api(`/api/follow/${encodeURIComponent(target)}/status`); button.textContent = state.following ? 'Unfollow' : 'Follow' } catch {} button.addEventListener('click', async () => { try { const state = await api(`/api/follow/${encodeURIComponent(target)}`, {method:'POST'}); button.textContent = state.following ? 'Unfollow' : 'Follow'; location.reload() } catch(e){ toast(e.message,'error') } }) }
+})
+</script>
+{% endblock %}

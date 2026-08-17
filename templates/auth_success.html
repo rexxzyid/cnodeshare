@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block title %}Login berhasil — CodeShare{% endblock %}
+{% block content %}<div class="shell auth-shell"><div class="card form-card" style="text-align:center"><div class="feature-icon" style="margin-inline:auto">✓</div><h1 class="page-title">Login berhasil</h1><p class="muted">Mengarahkan ke dashboard...</p></div></div>{% endblock %}
+{% block scripts %}<script>localStorage.setItem('token', {{ token | json | safe }});setTimeout(()=>location.href='/dashboard',350)</script>{% endblock %}

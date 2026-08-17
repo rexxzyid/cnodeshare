@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}CodeShare — Berbagi kode dengan cepat{% endblock %}
+{% block content %}
+<div class="shell">
+  <section class="hero">
+    <div>
+      <span class="eyebrow">⚡ Node.js 22 · realtime</span>
+      <h1><span class="gradient-text">Bagikan kode.</span><br>Tanpa ribet.</h1>
+      <p class="lead">Buat paste, lindungi dengan password, diskusikan lewat thread, dan bagikan link dalam hitungan detik.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="/create">Buat paste sekarang</a>
+        <a class="btn" href="#explore">Lihat paste publik</a>
+      </div>
+    </div>
+    <div class="hero-card" aria-hidden="true">
+      <div class="code-head"><span class="dots"><i></i><i></i><i></i></span><span class="muted">hello.mjs</span></div>
+      <div class="code-window"><span class="k">import</span> { share } <span class="k">from</span> <span class="s">'codeshare'</span>
+
+<span class="k">const</span> paste = <span class="k">await</span> share({
+  title: <span class="s">'clean & fast'</span>,
+  runtime: <span class="s">'node22'</span>,
+  visibility: <span class="s">'public'</span>
+})
+
+console.log(paste.url)
+<span class="c">// done. share the link.</span></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="grid grid-3">
+      <article class="card card-hover"><div class="feature-icon">⌁</div><h3>Link instan</h3><p>Paste punya URL sendiri dan siap dibagikan tanpa proses tambahan.</p></article>
+      <article class="card card-hover"><div class="feature-icon">◈</div><h3>Privasi fleksibel</h3><p>Public, private, atau password-protected sesuai kebutuhan.</p></article>
+      <article class="card card-hover"><div class="feature-icon">↯</div><h3>Realtime</h3><p>View counter dan notification channel menggunakan WebSocket.</p></article>
+    </div>
+  </section>
+
+  <section class="section" id="explore">
+    <div class="section-head">
+      <div><div class="page-kicker">Explore</div><h2>Paste terbaru</h2></div>
+      <form class="search-bar" id="home-search"><input class="input" id="search-input" placeholder="Cari judul, kode, user, bahasa..."><button class="btn" type="submit">Cari</button></form>
+    </div>
+    <div id="home-results" class="grid grid-3"><div class="card skeleton"></div><div class="card skeleton"></div><div class="card skeleton"></div></div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const grid = document.getElementById('home-results')
+  const render = items => {
+    grid.innerHTML = items.length ? items.map(item => item.type === 'user'
+      ? `<a class="card card-hover" href="/user/${encodeURIComponent(item.username)}"><div class="user-line"><div class="avatar">${escapeHtml(item.username[0].toUpperCase())}</div><div><h3>${escapeHtml(item.username)}</h3><div class="muted">${item.paste_count} paste</div></div></div></a>`
+      : pasteCard(item)).join('') : '<div class="empty" style="grid-column:1/-1"><strong>Tidak ada hasil</strong>Coba kata kunci lain.</div>'
+  }
+  try { render((await api('/api/public-pastes?limit=9')).pastes) } catch (e) { grid.innerHTML = `<div class="empty" style="grid-column:1/-1">${escapeHtml(e.message)}</div>` }
+  document.getElementById('home-search').addEventListener('submit', async e => {
+    e.preventDefault()
+    const q = document.getElementById('search-input').value.trim()
+    if (!q) return render((await api('/api/public-pastes?limit=9')).pastes)
+    grid.innerHTML = '<div class="card skeleton"></div><div class="card skeleton"></div><div class="card skeleton"></div>'
+    try { render((await api(`/api/search?q=${encodeURIComponent(q)}&limit=30`)).results) } catch (err) { toast(err.message, 'error') }
+  })
+})
+</script>
+{% endblock %}

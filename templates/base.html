@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#07080d">
+  <title>{% block title %}CodeShare{% endblock %}</title>
+  <meta name="description" content="Platform cepat untuk membagikan kode, paste, dan diskusi.">
+  <link rel="stylesheet" href="/assets/app.css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="nav">
+    <div class="shell nav-inner">
+      <a class="brand" href="/"><span class="brand-mark">&lt;/&gt;</span><span>CodeShare</span></a>
+      <nav class="nav-links">
+        <a class="nav-link" href="/">Explore</a>
+        <a class="nav-link" href="/users">Users</a>
+        <a class="nav-link" href="/feed">Feed</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn btn-sm btn-primary mobile-essential" href="/create">+ Paste</a>
+        <div id="nav-auth"></div>
+      </div>
+    </div>
+  </header>
+  <main class="main">{% block content %}{% endblock %}</main>
+  <footer class="footer">
+    <div class="shell footer-inner"><span>CodeShare · Node.js 22+</span><span>Share code, not friction.</span></div>
+  </footer>
+  <div class="toast-wrap"></div>
+  <script src="/assets/app.js" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
