@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}Cari kode — CodeShare{% endblock %}
+{% block description %}Cari paste publik berdasarkan judul, isi kode, bahasa, atau author.{% endblock %}
+{% block content %}
+<div class="shell">
+  <div class="page-head">
+    <div>
+      <div class="page-kicker">Search</div>
+      <h1 class="page-title">Cari kode &amp; orangnya.</h1>
+      <p class="muted">Pencarian mencakup judul, isi paste, bahasa, dan username. Paste private atau berpassword tidak pernah tampil.</p>
+    </div>
+  </div>
+
+  <form class="card search-panel search-form" id="search-form">
+    <div class="search-row">
+      <input class="input" id="q" name="q" placeholder="Cari: websocket reconnect, dockerfile, hooks..." autocomplete="off">
+      <button class="btn btn-primary" type="submit"><svg class="icon icon-sm"><use href="#i-search"></use></svg>Cari</button>
+    </div>
+    <div class="filters">
+      <div class="field">
+        <label class="label" for="language">Bahasa</label>
+        <select class="select" id="language" name="language">
+          <option value="">Semua bahasa</option>
+          <option value="javascript">JavaScript</option>
+          <option value="typescript">TypeScript</option>
+          <option value="python">Python</option>
+          <option value="go">Go</option>
+          <option value="rust">Rust</option>
+          <option value="java">Java</option>
+          <option value="php">PHP</option>
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+          <option value="json">JSON</option>
+          <option value="sql">SQL</option>
+          <option value="bash">Bash</option>
+          <option value="markdown">Markdown</option>
+          <option value="text">Plain text</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label" for="author">Author</label>
+        <input class="input" id="author" name="author" placeholder="username" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="label" for="sort">Urutkan</label>
+        <select class="select" id="sort" name="sort">
+          <option value="newest">Terbaru</option>
+          <option value="oldest">Terlama</option>
+          <option value="most_viewed">Paling banyak dilihat</option>
+          <option value="title">Judul A-Z</option>
+        </select>
+      </div>
+    </div>
+  </form>
+
+  <div class="search-meta">
+    <span id="result-count">Memuat hasil...</span>
+    <div class="chips" id="active-filters"></div>
+  </div>
+
+  <div class="grid grid-3 search-results" id="results">
+    <div class="card skeleton"></div><div class="card skeleton"></div><div class="card skeleton"></div>
+  </div>
+
+  <div class="pagination" id="pagination" hidden>
+    <button class="btn btn-sm" id="prev-page" type="button"><svg class="icon icon-sm" style="transform:rotate(180deg)"><use href="#i-arrow"></use></svg>Sebelumnya</button>
+    <span id="page-label">1 / 1</span>
+    <button class="btn btn-sm" id="next-page" type="button">Berikutnya<svg class="icon icon-sm"><use href="#i-arrow"></use></svg></button>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('search-form')
+  const results = document.getElementById('results')
+  const countLabel = document.getElementById('result-count')
+  const pagination = document.getElementById('pagination')
+  const pageLabel = document.getElementById('page-label')
+  const state = { q: '', language: '', author: '', sort: 'newest', page: 1, limit: 18 }
+
+  function readUrl() {
+    const params = new URLSearchParams(location.search)
+    state.q = params.get('q') || ''
+    state.language = params.get('language') || ''
+    state.author = params.get('author') || ''
+    state.sort = params.get('sort') || 'newest'
+    state.page = Math.max(1, Number(params.get('page')) || 1)
+    form.q.value = state.q
+    form.language.value = state.language
+    form.author.value = state.author
+    form.sort.value = state.sort
+  }
+
+  function writeUrl() {
+    const params = new URLSearchParams()
+    if (state.q) params.set('q', state.q)
+    if (state.language) params.set('language', state.language)
+    if (state.author) params.set('author', state.author)
+    if (state.sort !== 'newest') params.set('sort', state.sort)
+    if (state.page > 1) params.set('page', String(state.page))
+    const query = params.toString()
+    history.replaceState(null, '', query ? `/search?${query}` : '/search')
+  }
+
+  function renderFilters() {
+    const active = []
+    if (state.q) active.push(['q', `"${state.q}"`])
+    if (state.language) active.push(['language', state.language])
+    if (state.author) active.push(['author', `@${state.author}`])
+    if (state.sort !== 'newest') active.push(['sort', state.sort])
+    const box = document.getElementById('active-filters')
+    box.innerHTML = active.map(([key, label]) => `<button class="chip" type="button" data-clear="${escapeHtml(key)}">${escapeHtml(label)} ${icon('close')}</button>`).join('')
+    box.querySelectorAll('[data-clear]').forEach(chip => chip.addEventListener('click', () => {
+      const key = chip.dataset.clear
+      state[key] = key === 'sort' ? 'newest' : ''
+      form[key].value = state[key]
+      state.page = 1
+      run()
+    }))
+  }
+
+  function renderResults(data) {
+    const items = data.results || []
+    countLabel.textContent = data.total
+      ? `${formatNumber(data.total)} hasil · halaman ${data.page} dari ${data.pages}`
+      : 'Tidak ada hasil'
+    results.innerHTML = items.length
+      ? items.map(item => item.type === 'user' ? userCard(item) : pasteCard(item)).join('')
+      : `<div class="empty"><strong>Tidak ada yang cocok</strong>Coba kata kunci lain atau kosongkan filter bahasa dan author.</div>`
+    pagination.hidden = (data.pages || 0) <= 1
+    pageLabel.textContent = `${data.page} / ${data.pages || 1}`
+    document.getElementById('prev-page').disabled = data.page <= 1
+    document.getElementById('next-page').disabled = data.page >= data.pages
+  }
+
+  async function run() {
+    writeUrl()
+    renderFilters()
+    results.innerHTML = '<div class="card skeleton"></div><div class="card skeleton"></div><div class="card skeleton"></div>'
+    countLabel.textContent = 'Memuat hasil...'
+    const params = new URLSearchParams({ sort: state.sort, page: String(state.page), limit: String(state.limit) })
+    if (state.q) params.set('q', state.q)
+    if (state.language) params.set('language', state.language)
+    if (state.author) params.set('author', state.author)
+    try {
+      renderResults(await api(`/api/search?${params}`))
+    } catch (error) {
+      countLabel.textContent = 'Pencarian gagal'
+      results.innerHTML = `<div class="empty"><strong>Gagal memuat</strong>${escapeHtml(error.message)}</div>`
+      pagination.hidden = true
+    }
+  }
+
+  form.addEventListener('submit', event => {
+    event.preventDefault()
+    state.q = form.q.value.trim()
+    state.language = form.language.value
+    state.author = form.author.value.trim()
+    state.sort = form.sort.value
+    state.page = 1
+    run()
+  })
+
+  form.language.addEventListener('change', () => form.requestSubmit())
+  form.sort.addEventListener('change', () => form.requestSubmit())
+
+  document.getElementById('prev-page').addEventListener('click', () => {
+    if (state.page <= 1) return
+    state.page -= 1
+    run()
+    scrollTo({ top: 0, behavior: 'smooth' })
+  })
+
+  document.getElementById('next-page').addEventListener('click', () => {
+    state.page += 1
+    run()
+    scrollTo({ top: 0, behavior: 'smooth' })
+  })
+
+  readUrl()
+  run()
+})
+</script>
+{% endblock %}

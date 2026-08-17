@@ -3,31 +3,45 @@
 {% block content %}
 <div class="shell auth-shell">
   <div class="card form-card">
-    <div class="page-kicker">Welcome back</div><h1 class="page-title">Masuk</h1><p class="muted">Lanjutkan ke dashboard dan paste milikmu.</p>
-    <div id="error" class="notice notice-error" hidden></div>
-    <form id="login-form" style="margin-top:22px">
-      <div class="field"><label class="label">Username</label><input class="input" name="username" autocomplete="username" required></div>
-      <div class="field"><label class="label">Password</label><input class="input" name="password" type="password" autocomplete="current-password" required></div>
+    <div class="page-kicker">Welcome back</div>
+    <h1 class="page-title">Masuk</h1>
+    <p class="muted">Lanjutkan ke dashboard dan paste milikmu.</p>
+    <div id="error" class="notice notice-error" style="margin-top:20px" hidden></div>
+    <form id="login-form" style="margin-top:24px">
+      <div class="field"><label class="label" for="username">Username</label><input class="input" id="username" name="username" autocomplete="username" required></div>
+      <div class="field"><label class="label" for="password">Password</label><input class="input" id="password" name="password" type="password" autocomplete="current-password" required></div>
       <button class="btn btn-primary btn-block" type="submit">Masuk</button>
     </form>
     <div class="divider">atau</div>
-    <a class="btn btn-block" href="/auth/google">Masuk dengan Google</a>
-    <p class="muted" style="text-align:center;margin:18px 0 0">Belum punya akun? <a href="/signup" style="color:#c8c1ff">Daftar</a></p>
+    <a class="btn btn-block" href="/auth/google"><svg class="icon icon-sm"><use href="#i-globe"></use></svg>Masuk dengan Google</a>
+    <p class="muted" style="text-align:center;margin:20px 0 0">Belum punya akun? <a href="/signup"><strong>Daftar</strong></a></p>
   </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const params = new URLSearchParams(location.search)
-  const err = params.get('error')
-  if (err) { const box = document.getElementById('error'); box.hidden = false; box.textContent = err === 'google_not_configured' ? 'Google OAuth belum dikonfigurasi di .env.' : 'Login Google gagal.' }
-  document.getElementById('login-form').addEventListener('submit', async e => {
-    e.preventDefault(); const button = e.submitter; button.disabled = true; button.textContent = 'Memproses...'
+  const box = document.getElementById('error')
+  const failure = new URLSearchParams(location.search).get('error')
+  if (failure) {
+    box.hidden = false
+    box.textContent = failure === 'google_not_configured' ? 'Google OAuth belum dikonfigurasi pada server ini.' : 'Login dengan Google gagal.'
+  }
+  document.getElementById('login-form').addEventListener('submit', async event => {
+    event.preventDefault()
+    const button = event.submitter
+    button.disabled = true
+    button.textContent = 'Memproses...'
     try {
-      const data = await api('/api/login', { method: 'POST', body: new FormData(e.currentTarget) })
-      CodeShare.auth.set(data.access_token); location.href = '/dashboard'
-    } catch (error) { const box = document.getElementById('error'); box.hidden = false; box.textContent = error.message; button.disabled = false; button.textContent = 'Masuk' }
+      const data = await api('/api/login', { method: 'POST', body: new FormData(event.currentTarget) })
+      CodeShare.auth.set(data.access_token)
+      location.href = '/dashboard'
+    } catch (error) {
+      box.hidden = false
+      box.textContent = error.message
+      button.disabled = false
+      button.textContent = 'Masuk'
+    }
   })
 })
 </script>

@@ -2,15 +2,35 @@
 {% block title %}Feed — CodeShare{% endblock %}
 {% block content %}
 <div class="shell">
-  <div class="page-head"><div><div class="page-kicker">Following</div><h1 class="page-title">Feed kamu</h1><p class="muted">Paste publik terbaru dari user yang kamu follow.</p></div></div>
-  <div id="feed-grid" class="grid grid-3"><div class="card skeleton"></div><div class="card skeleton"></div><div class="card skeleton"></div></div>
+  <div class="page-head">
+    <div>
+      <div class="page-kicker">Following</div>
+      <h1 class="page-title">Feed kamu</h1>
+      <p class="muted">Paste publik terbaru dari user yang kamu ikuti.</p>
+    </div>
+    <a class="btn" href="/users"><svg class="icon icon-sm"><use href="#i-users"></use></svg>Cari orang untuk diikuti</a>
+  </div>
+  <div id="feed-grid" class="grid grid-3">
+    <div class="card skeleton"></div><div class="card skeleton"></div><div class="card skeleton"></div>
+  </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
-  const grid=document.getElementById('feed-grid'); if(!CodeShare.auth.token()){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><strong>Login untuk membuka feed</strong><a class="btn btn-primary" href="/login" style="margin-top:12px">Masuk</a></div>';return}
-  try{const data=await api('/api/feed?limit=30');grid.innerHTML=data.pastes.length?data.pastes.map(pasteCard).join(''):'<div class="empty" style="grid-column:1/-1"><strong>Feed masih kosong</strong>Follow user dari halaman Users untuk mulai mengisi feed.</div>'}catch(e){grid.innerHTML=`<div class="empty" style="grid-column:1/-1">${escapeHtml(e.message)}</div>`}
+  const grid = document.getElementById('feed-grid')
+  if (!CodeShare.auth.token()) {
+    grid.innerHTML = '<div class="empty"><strong>Login untuk membuka feed</strong><a class="btn btn-primary" href="/login" style="margin-top:14px">Masuk</a></div>'
+    return
+  }
+  try {
+    const data = await api('/api/feed?limit=30')
+    grid.innerHTML = data.pastes.length
+      ? data.pastes.map(pasteCard).join('')
+      : '<div class="empty"><strong>Feed masih kosong</strong>Follow user dari halaman Users untuk mulai mengisi feed.</div>'
+  } catch (error) {
+    grid.innerHTML = `<div class="empty"><strong>Gagal memuat feed</strong>${escapeHtml(error.message)}</div>`
+  }
 })
 </script>
 {% endblock %}

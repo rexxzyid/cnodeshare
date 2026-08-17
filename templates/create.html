@@ -2,34 +2,78 @@
 {% block title %}Buat Paste — CodeShare{% endblock %}
 {% block content %}
 <div class="shell form-shell">
-  <div class="page-head"><div><div class="page-kicker">New paste</div><h1 class="page-title">Buat sesuatu yang bisa dibagikan.</h1></div></div>
+  <div class="page-head">
+    <div>
+      <div class="page-kicker">New paste</div>
+      <h1 class="page-title">Buat sesuatu<br>yang bisa dibagikan.</h1>
+    </div>
+  </div>
   <form id="paste-form" class="card form-card">
     <div id="auth-warning" class="notice notice-error" hidden>Kamu perlu login sebelum membuat paste.</div>
-    <div class="field"><label class="label">Judul</label><input class="input" name="title" maxlength="160" placeholder="Contoh: WebSocket reconnect helper" required></div>
-    <div class="form-row">
-      <div class="field"><label class="label">Bahasa</label><select class="select" name="language"><option value="text">Plain text</option><option value="javascript">JavaScript</option><option value="typescript">TypeScript</option><option value="python">Python</option><option value="go">Go</option><option value="html">HTML</option><option value="css">CSS</option><option value="json">JSON</option><option value="bash">Bash</option><option value="sql">SQL</option><option value="markdown">Markdown</option></select></div>
-      <div class="field"><label class="label">Import file teks</label><input class="input" type="file" name="file"><span class="help">Maks. 5 MB. Bahasa bisa dideteksi dari ekstensi.</span></div>
+    <div class="field">
+      <label class="label" for="title">Judul</label>
+      <input class="input" id="title" name="title" maxlength="160" placeholder="Contoh: WebSocket reconnect helper" required>
     </div>
-    <div class="field"><label class="label">Kode / isi paste</label><textarea class="textarea" name="content" spellcheck="false" placeholder="Tempel kode atau teks di sini..."></textarea></div>
+    <div class="form-row">
+      <div class="field">
+        <label class="label" for="language">Bahasa</label>
+        <select class="select" id="language" name="language">
+          <option value="text">Plain text</option>
+          <option value="javascript">JavaScript</option>
+          <option value="typescript">TypeScript</option>
+          <option value="python">Python</option>
+          <option value="go">Go</option>
+          <option value="rust">Rust</option>
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+          <option value="json">JSON</option>
+          <option value="bash">Bash</option>
+          <option value="sql">SQL</option>
+          <option value="markdown">Markdown</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label" for="file">Import file teks</label>
+        <input class="input" id="file" type="file" name="file">
+        <span class="help">Maks. 5 MB. Bahasa dideteksi dari ekstensi file.</span>
+      </div>
+    </div>
+    <div class="field">
+      <label class="label" for="content">Kode / isi paste</label>
+      <textarea class="textarea" id="content" name="content" spellcheck="false" placeholder="Tempel kode atau teks di sini..."></textarea>
+    </div>
     <div class="form-row">
       <label class="checkbox"><input type="checkbox" name="is_private"> Private paste</label>
-      <div class="field" style="margin:0"><input class="input" type="password" name="password" placeholder="Password opsional"></div>
+      <div class="field" style="margin:0">
+        <input class="input" type="password" name="password" placeholder="Password opsional">
+      </div>
     </div>
-    <div class="form-actions"><a class="btn" href="/dashboard">Batal</a><button class="btn btn-primary" type="submit">Publish paste</button></div>
+    <div class="form-actions">
+      <a class="btn" href="/dashboard">Batal</a>
+      <button class="btn btn-primary" type="submit"><svg class="icon icon-sm"><use href="#i-bolt"></use></svg>Publish paste</button>
+    </div>
   </form>
 </div>
 {% endblock %}
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
-  if (!CodeShare.auth.token()) { document.getElementById('auth-warning').hidden = false }
+document.addEventListener('DOMContentLoaded', () => {
+  if (!CodeShare.auth.token()) document.getElementById('auth-warning').hidden = false
   const form = document.getElementById('paste-form')
-  form.addEventListener('submit', async e => {
-    e.preventDefault()
+  form.addEventListener('submit', async event => {
+    event.preventDefault()
     if (!CodeShare.auth.token()) return location.href = '/login'
-    const button = e.submitter; button.disabled = true; button.textContent = 'Publishing...'
-    try { const data = await api('/api/paste', { method: 'POST', body: new FormData(form) }); location.href = `/paste/${data.paste_id}` }
-    catch (error) { toast(error.message, 'error'); button.disabled = false; button.textContent = 'Publish paste' }
+    const button = event.submitter
+    button.disabled = true
+    button.textContent = 'Publishing...'
+    try {
+      const data = await api('/api/paste', { method: 'POST', body: new FormData(form) })
+      location.href = `/paste/${data.paste_id}`
+    } catch (error) {
+      toast(error.message, 'error')
+      button.disabled = false
+      button.textContent = 'Publish paste'
+    }
   })
 })
 </script>
