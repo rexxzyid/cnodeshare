@@ -2,21 +2,6 @@
 
 CodeShare versi ini adalah rewrite penuh dari backend FastAPI/Python ke Node.js 22+ dengan Express, Nunjucks, WebSocket, dan penyimpanan JSON yang tetap kompatibel dengan struktur data lama.
 
-## Yang berubah
-
-- Backend Python/FastAPI dihapus dan diganti Node.js 22+
-- Port default tetap `8700`
-- UI dirework dengan CSS/JavaScript lokal tanpa Tailwind CDN
-- JSON file memakai async I/O, atomic write, dan cache berdasarkan `mtime`
-- WebSocket realtime tetap tersedia
-- JWT + bcrypt tetap dipakai sehingga hash bcrypt lama tetap kompatibel
-- Follow system yang sebelumnya dipanggil UI tetapi route-nya tidak ada sekarang sudah diimplementasikan
-- `feed.html` yang sebelumnya dirujuk tetapi tidak ada sekarang tersedia
-- Admin dashboard digabung ke dashboard utama dan tidak lagi bergantung pada `dashboardadmin.html` yang hilang
-- Rate limit untuk API/auth/runner
-- Helmet + compression
-- Upload limit 5 MB
-- Search dan halaman users menghindari repeated full-directory scan per user
 
 ## Requirement
 
