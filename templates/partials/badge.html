@@ -1,0 +1,5 @@
+{% macro badgeChip(badge) %}<span class="badge" data-badge="{{ badge.key }}" title="{{ badge.description }}"><svg class="badge-icon"><use href="#i-{{ badge.icon }}"></use></svg>{{ badge.name }}</span>{% endmacro %}
+
+{% macro badgeList(badges, limit=0) %}<div class="badges">{% for badge in badges %}{% if not limit or loop.index <= limit %}{{ badgeChip(badge) }}{% endif %}{% endfor %}</div>{% endmacro %}
+
+{% macro verifiedMark(user) %}{% if user.is_admin or user.verified_by_admin %}<span class="badge-check" title="{% if user.is_admin %}Admin{% else %}Verified{% endif %}"><svg class="badge-icon"><use href="#i-check"></use></svg></span>{% endif %}{% endmacro %}

@@ -2,52 +2,75 @@
 {% block title %}Dashboard — CodeShare{% endblock %}
 {% block content %}
 <div class="shell" id="dashboard-root" data-tabs-root>
-  <div id="dashboard-loading" class="card"><div class="skeleton" style="min-height:180px;border-radius:14px"></div></div>
+  <div id="dashboard-loading" class="card"><div class="skeleton" style="min-height:180px;border-radius:8px"></div></div>
   <div id="dashboard-content" hidden>
     <div class="page-head">
-      <div><div class="page-kicker">Dashboard</div><h1 class="page-title" id="welcome-title">Welcome back.</h1><p class="muted">Kelola paste, profil, dan aktivitas akun.</p></div>
-      <a class="btn btn-primary" href="/create">+ Buat paste</a>
+      <div>
+        <div class="page-kicker">Dashboard</div>
+        <h1 class="page-title" id="welcome-title">Welcome back.</h1>
+        <p class="muted">Kelola paste, profil, dan aktivitas akun.</p>
+      </div>
+      <a class="btn btn-primary" href="/create"><svg class="icon icon-sm"><use href="#i-plus"></use></svg>Buat paste</a>
     </div>
+
     <div class="stats">
       <div class="stat"><strong id="stat-pastes">0</strong><span>Total paste</span></div>
       <div class="stat"><strong id="stat-views">0</strong><span>Total views</span></div>
       <div class="stat"><strong id="stat-badges">0</strong><span>Badges</span></div>
     </div>
+
     <div class="tabs">
-      <button class="tab active" data-tab="pastes">Pastes</button>
-      <button class="tab" data-tab="profile">Profile</button>
-      <button class="tab" data-tab="notifications">Notifications</button>
-      <button class="tab" data-tab="admin" id="admin-tab" hidden>Admin</button>
+      <button class="tab active" data-tab="pastes" type="button">Pastes</button>
+      <button class="tab" data-tab="profile" type="button">Profile</button>
+      <button class="tab" data-tab="notifications" type="button">Notifications</button>
+      <button class="tab" data-tab="admin" id="admin-tab" type="button" hidden>Admin</button>
     </div>
 
     <section class="tab-panel active" data-panel="pastes">
       <div class="card">
-        <div class="section-head"><div><h3>Your pastes</h3><p class="muted">Semua paste yang dibuat oleh akun ini.</p></div></div>
-        <div class="table-wrap"><table><thead><tr><th>Paste</th><th>Language</th><th>Views</th><th>Dibuat</th><th>Action</th></tr></thead><tbody id="paste-rows"></tbody></table></div>
+        <div class="section-head"><div><h3>Paste kamu</h3><p class="muted">Semua paste yang dibuat oleh akun ini.</p></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Paste</th><th>Language</th><th>Views</th><th>Dibuat</th><th>Action</th></tr></thead>
+            <tbody id="paste-rows"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
     <section class="tab-panel" data-panel="profile">
+      <div class="card" style="margin-bottom:18px">
+        <div class="section-head"><div><h3>Badge kamu</h3><p class="muted">Badge dihitung ulang otomatis dari jumlah paste dan views.</p></div></div>
+        <div id="profile-badges"></div>
+      </div>
       <div class="grid grid-2">
         <form class="card form-card" id="profile-form">
-          <h3>Account details</h3><p class="muted" style="margin-bottom:18px">Ubah nama tampilan, username, atau password.</p>
-          <div class="field"><label class="label">Display name</label><input class="input" name="name" id="profile-name" maxlength="80"></div>
-          <div class="field"><label class="label">Username</label><input class="input" name="username" id="profile-username" required></div>
-          <div class="field"><label class="label">Password baru</label><input class="input" name="password" type="password" minlength="8" placeholder="Kosongkan jika tidak diubah"></div>
+          <h3>Detail akun</h3>
+          <p class="muted" style="margin-bottom:20px">Ubah nama tampilan, username, atau password.</p>
+          <div class="field"><label class="label" for="profile-name">Display name</label><input class="input" id="profile-name" name="name" maxlength="80"></div>
+          <div class="field"><label class="label" for="profile-username">Username</label><input class="input" id="profile-username" name="username" required></div>
+          <div class="field"><label class="label" for="profile-password">Password baru</label><input class="input" id="profile-password" name="password" type="password" minlength="8" placeholder="Kosongkan jika tidak diubah"></div>
           <button class="btn btn-primary" type="submit">Simpan profil</button>
         </form>
         <form class="card form-card" id="picture-form">
-          <h3>Profile picture</h3><p class="muted" style="margin-bottom:18px">PNG, JPG, GIF, atau WebP sampai 5 MB.</p>
-          <div class="user-line" style="margin-bottom:18px"><div id="profile-avatar"></div><div><strong id="profile-card-user"></strong><div class="muted" id="profile-email"></div></div></div>
+          <h3>Foto profil</h3>
+          <p class="muted" style="margin-bottom:20px">PNG, JPG, GIF, atau WebP sampai 5 MB.</p>
+          <div class="user-line" style="margin-bottom:20px">
+            <div id="profile-avatar"></div>
+            <div><strong id="profile-card-user"></strong><div class="muted" id="profile-email"></div></div>
+          </div>
           <div class="field"><input class="input" name="file" type="file" accept="image/png,image/jpeg,image/gif,image/webp" required></div>
-          <button class="btn" type="submit">Upload image</button>
+          <button class="btn" type="submit">Upload gambar</button>
         </form>
       </div>
     </section>
 
     <section class="tab-panel" data-panel="notifications">
       <div class="card">
-        <div class="section-head"><div><h3>Notifications</h3><p class="muted">Aktivitas terbaru untuk akunmu.</p></div><button class="btn btn-sm" id="read-all">Mark all read</button></div>
+        <div class="section-head">
+          <div><h3>Notifications</h3><p class="muted">Aktivitas terbaru untuk akunmu.</p></div>
+          <button class="btn btn-sm" id="read-all" type="button"><svg class="icon icon-sm"><use href="#i-check"></use></svg>Tandai semua</button>
+        </div>
         <div id="notification-list"></div>
       </div>
     </section>
@@ -58,13 +81,23 @@
         <div class="stat"><strong id="admin-pastes">0</strong><span>Pastes</span></div>
         <div class="stat"><strong id="admin-views">0</strong><span>Views</span></div>
       </div>
-      <div class="card" style="margin-bottom:16px">
+      <div class="card" style="margin-bottom:18px">
         <div class="section-head"><div><h3>User management</h3><p class="muted">Verify, promote, atau hapus user.</p></div></div>
-        <div class="table-wrap"><table><thead><tr><th>User</th><th>Status</th><th>Joined</th><th>Action</th></tr></thead><tbody id="admin-user-rows"></tbody></table></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>User</th><th>Status</th><th>Joined</th><th>Action</th></tr></thead>
+            <tbody id="admin-user-rows"></tbody>
+          </table>
+        </div>
       </div>
       <div class="card">
         <div class="section-head"><div><h3>Paste moderation</h3><p class="muted">500 paste terbaru.</p></div></div>
-        <div class="table-wrap"><table><thead><tr><th>Paste</th><th>Author</th><th>Views</th><th>Action</th></tr></thead><tbody id="admin-paste-rows"></tbody></table></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Paste</th><th>Author</th><th>Views</th><th>Action</th></tr></thead>
+            <tbody id="admin-paste-rows"></tbody>
+          </table>
+        </div>
       </div>
     </section>
   </div>
@@ -72,80 +105,155 @@
 {% endblock %}
 {% block scripts %}
 <script>
-const fmt = n => Number(n || 0).toLocaleString('id-ID')
-let dashboardData = null
-
-function avatarHtml(user, size='') {
-  return user.profile_picture ? `<img class="avatar ${size}" src="${escapeHtml(user.profile_picture)}" alt="">` : `<div class="avatar ${size}">${escapeHtml((user.username || '?')[0].toUpperCase())}</div>`
-}
-
-async function loadDashboard() {
-  if (!CodeShare.auth.token()) return location.href = '/login'
-  try {
-    dashboardData = await api('/api/dashboard')
-    const { user, pastes, stats } = dashboardData
-    document.getElementById('welcome-title').textContent = `Halo, ${user.username}.`
-    document.getElementById('stat-pastes').textContent = fmt(stats.total_pastes)
-    document.getElementById('stat-views').textContent = fmt(stats.total_views)
-    document.getElementById('stat-badges').textContent = fmt(user.badges.length)
-    document.getElementById('profile-name').value = user.name || ''
-    document.getElementById('profile-username').value = user.username
-    document.getElementById('profile-avatar').innerHTML = avatarHtml(user, 'avatar-lg')
-    document.getElementById('profile-card-user').textContent = user.username
-    document.getElementById('profile-email').textContent = user.email || ''
-    document.getElementById('paste-rows').innerHTML = pastes.length ? pastes.map(p => `<tr><td><a href="/paste/${encodeURIComponent(p.id)}"><strong>${escapeHtml(p.title)}</strong></a>${p.is_private ? '<div class="muted">Private</div>' : ''}</td><td><span class="tag">${escapeHtml(p.language)}</span></td><td>${fmt(p.views)}</td><td class="muted">${timeAgo(p.created_at)}</td><td><div class="actions"><a class="btn btn-sm" href="/edit/${encodeURIComponent(p.id)}">Edit</a><button class="btn btn-sm btn-danger" data-delete-paste="${escapeHtml(p.id)}">Delete</button></div></td></tr>`).join('') : '<tr><td colspan="5"><div class="empty"><strong>Belum ada paste</strong>Buat paste pertama kamu.</div></td></tr>'
-    document.querySelectorAll('[data-delete-paste]').forEach(btn => btn.addEventListener('click', async () => {
-      if (!confirm('Hapus paste ini?')) return
-      try { await api(`/api/paste/${encodeURIComponent(btn.dataset.deletePaste)}`, {method:'DELETE'}); toast('Paste dihapus','success'); loadDashboard() } catch(e) { toast(e.message,'error') }
-    }))
-    if (user.is_admin) { document.getElementById('admin-tab').hidden = false; loadAdmin() }
-    loadNotifications()
-    document.getElementById('dashboard-loading').hidden = true
-    document.getElementById('dashboard-content').hidden = false
-  } catch (error) {
-    if (error.status === 401) { CodeShare.auth.clear(); return location.href='/login' }
-    document.getElementById('dashboard-loading').innerHTML = `<div class="notice notice-error">${escapeHtml(error.message)}</div>`
-  }
-}
-
-async function loadNotifications() {
-  try {
-    const data = await api('/api/notifications')
-    const root = document.getElementById('notification-list')
-    root.innerHTML = data.notifications.length ? data.notifications.map(n => `<article class="comment" style="opacity:${n.read ? '.62':'1'}"><div class="comment-head"><strong>${escapeHtml(n.title)}</strong><span class="muted">${timeAgo(n.created_at)}</span></div><div class="comment-body">${escapeHtml(n.message)}</div>${n.read ? '' : `<button class="btn btn-sm btn-ghost" data-read="${escapeHtml(n.id)}" style="margin-top:8px">Mark read</button>`}</article>`).join('') : '<div class="empty"><strong>Tidak ada notifikasi</strong>Aktivitas baru akan muncul di sini.</div>'
-    root.querySelectorAll('[data-read]').forEach(btn => btn.addEventListener('click', async () => { await api(`/api/notifications/${encodeURIComponent(btn.dataset.read)}/read`, {method:'POST'}); loadNotifications() }))
-  } catch {}
-}
-
-async function loadAdmin() {
-  try {
-    const [stats, users, pastes] = await Promise.all([api('/api/admin/stats'), api('/api/admin/users'), api('/api/admin/pastes')])
-    document.getElementById('admin-users').textContent = fmt(stats.total_users)
-    document.getElementById('admin-pastes').textContent = fmt(stats.total_pastes)
-    document.getElementById('admin-views').textContent = fmt(stats.total_views)
-    document.getElementById('admin-user-rows').innerHTML = users.users.map(u => `<tr><td><div class="user-line">${avatarHtml(u)}<div><strong>${escapeHtml(u.username)}</strong><div class="muted">${escapeHtml(u.email || '')}</div></div></div></td><td>${u.is_admin ? '<span class="badge" data-badge="admin">Admin</span>' : u.verified_by_admin ? '<span class="badge" data-badge="verified">Verified</span>' : '<span class="muted">Member</span>'}</td><td class="muted">${timeAgo(u.created_at)}</td><td><div class="actions">${u.verified_by_admin ? '' : `<button class="btn btn-sm" data-verify="${escapeHtml(u.username)}">Verify</button>`}${u.is_admin ? '' : `<button class="btn btn-sm" data-promote="${escapeHtml(u.username)}">Promote</button>`}${u.username === dashboardData.user.username ? '' : `<button class="btn btn-sm btn-danger" data-delete-user="${escapeHtml(u.username)}">Delete</button>`}</div></td></tr>`).join('')
-    document.getElementById('admin-paste-rows').innerHTML = pastes.pastes.map(p => `<tr><td><a href="/paste/${encodeURIComponent(p.id)}"><strong>${escapeHtml(p.title)}</strong></a><div class="muted"><span class="tag">${escapeHtml(p.language)}</span></div></td><td>${escapeHtml(p.author_username)}</td><td>${fmt(p.views)}</td><td><button class="btn btn-sm btn-danger" data-admin-delete-paste="${escapeHtml(p.id)}">Delete</button></td></tr>`).join('')
-    document.querySelectorAll('[data-verify]').forEach(btn => btn.addEventListener('click', () => adminForm('/api/admin/verify-user', btn.dataset.verify)))
-    document.querySelectorAll('[data-promote]').forEach(btn => btn.addEventListener('click', () => adminForm('/api/admin/promote-user', btn.dataset.promote)))
-    document.querySelectorAll('[data-delete-user]').forEach(btn => btn.addEventListener('click', async () => { if(!confirm(`Hapus user ${btn.dataset.deleteUser} beserta semua paste?`))return; try{await api(`/api/admin/user/${encodeURIComponent(btn.dataset.deleteUser)}`,{method:'DELETE'});toast('User dihapus','success');loadAdmin()}catch(e){toast(e.message,'error')}}))
-    document.querySelectorAll('[data-admin-delete-paste]').forEach(btn => btn.addEventListener('click', async () => { if(!confirm('Hapus paste ini?'))return; try{await api(`/api/admin/paste/${encodeURIComponent(btn.dataset.adminDeletePaste)}`,{method:'DELETE'});toast('Paste dihapus','success');loadAdmin()}catch(e){toast(e.message,'error')}}))
-  } catch (e) { toast(e.message,'error') }
-}
-
-async function adminForm(url, username) {
-  const data = new FormData(); data.append('username', username)
-  try { const result = await api(url, {method:'POST', body:data}); toast(result.message,'success'); loadAdmin() } catch(e) { toast(e.message,'error') }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
+  let dashboardData = null
+
+  async function loadDashboard() {
+    if (!CodeShare.auth.token()) return location.href = '/login'
+    try {
+      dashboardData = await api('/api/dashboard')
+      const { user, pastes, stats } = dashboardData
+      document.getElementById('welcome-title').textContent = `Halo, ${user.username}.`
+      document.getElementById('stat-pastes').textContent = formatNumber(stats.total_pastes)
+      document.getElementById('stat-views').textContent = formatNumber(stats.total_views)
+      document.getElementById('stat-badges').textContent = formatNumber(user.badges.length)
+      document.getElementById('profile-badges').innerHTML = badgeListHtml(user.badge_details)
+      document.getElementById('profile-name').value = user.name || ''
+      document.getElementById('profile-username').value = user.username
+      document.getElementById('profile-avatar').innerHTML = avatarHtml(user, 'avatar-lg')
+      document.getElementById('profile-card-user').textContent = user.username
+      document.getElementById('profile-email').textContent = user.email || ''
+      document.getElementById('paste-rows').innerHTML = pastes.length
+        ? pastes.map(paste => `<tr>
+            <td><a href="/paste/${encodeURIComponent(paste.id)}"><strong>${escapeHtml(paste.title)}</strong></a>${paste.is_private ? '<div class="muted">Private</div>' : ''}</td>
+            <td><span class="tag">${escapeHtml(paste.language)}</span></td>
+            <td>${formatNumber(paste.views)}</td>
+            <td class="muted">${timeAgo(paste.created_at)}</td>
+            <td><div class="actions"><a class="btn btn-sm" href="/edit/${encodeURIComponent(paste.id)}">Edit</a><button class="btn btn-sm btn-danger" type="button" data-delete-paste="${escapeHtml(paste.id)}">Hapus</button></div></td>
+          </tr>`).join('')
+        : '<tr><td colspan="5"><div class="empty"><strong>Belum ada paste</strong>Buat paste pertama kamu.</div></td></tr>'
+      document.querySelectorAll('[data-delete-paste]').forEach(button => button.addEventListener('click', async () => {
+        if (!confirm('Hapus paste ini?')) return
+        try {
+          await api(`/api/paste/${encodeURIComponent(button.dataset.deletePaste)}`, { method: 'DELETE' })
+          toast('Paste dihapus', 'success')
+          loadDashboard()
+        } catch (error) { toast(error.message, 'error') }
+      }))
+      if (user.is_admin) {
+        document.getElementById('admin-tab').hidden = false
+        loadAdmin()
+      }
+      loadNotifications()
+      document.getElementById('dashboard-loading').hidden = true
+      document.getElementById('dashboard-content').hidden = false
+    } catch (error) {
+      if (error.status === 401) {
+        CodeShare.auth.clear()
+        return location.href = '/login'
+      }
+      document.getElementById('dashboard-loading').innerHTML = `<div class="notice notice-error">${escapeHtml(error.message)}</div>`
+    }
+  }
+
+  async function loadNotifications() {
+    try {
+      const data = await api('/api/notifications')
+      const root = document.getElementById('notification-list')
+      root.innerHTML = data.notifications.length
+        ? data.notifications.map(item => `<article class="comment" style="opacity:${item.read ? '.6' : '1'}">
+            <div class="comment-head"><strong>${escapeHtml(item.title)}</strong><span class="muted">${timeAgo(item.created_at)}</span></div>
+            <div class="comment-body">${escapeHtml(item.message)}</div>
+            ${item.read ? '' : `<button class="btn btn-sm btn-ghost" type="button" data-read="${escapeHtml(item.id)}" style="margin-top:10px">Tandai dibaca</button>`}
+          </article>`).join('')
+        : '<div class="empty"><strong>Tidak ada notifikasi</strong>Aktivitas baru akan muncul di sini.</div>'
+      root.querySelectorAll('[data-read]').forEach(button => button.addEventListener('click', async () => {
+        await api(`/api/notifications/${encodeURIComponent(button.dataset.read)}/read`, { method: 'POST' })
+        loadNotifications()
+      }))
+    } catch {}
+  }
+
+  async function loadAdmin() {
+    try {
+      const [stats, users, pastes] = await Promise.all([api('/api/admin/stats'), api('/api/admin/users'), api('/api/admin/pastes')])
+      document.getElementById('admin-users').textContent = formatNumber(stats.total_users)
+      document.getElementById('admin-pastes').textContent = formatNumber(stats.total_pastes)
+      document.getElementById('admin-views').textContent = formatNumber(stats.total_views)
+      document.getElementById('admin-user-rows').innerHTML = users.users.map(user => `<tr>
+          <td><div class="user-line">${avatarHtml(user)}<div><strong>${escapeHtml(user.username)}</strong><div class="muted">${escapeHtml(user.email || '')}</div></div></div></td>
+          <td>${user.is_admin ? badgeHtml({ key: 'admin', name: 'Admin', icon: 'bolt' }) : user.verified_by_admin ? badgeHtml({ key: 'verified', name: 'Verified', icon: 'shield' }) : '<span class="muted">Member</span>'}</td>
+          <td class="muted">${timeAgo(user.created_at)}</td>
+          <td><div class="actions">
+            ${user.verified_by_admin ? '' : `<button class="btn btn-sm" type="button" data-verify="${escapeHtml(user.username)}">Verify</button>`}
+            ${user.is_admin ? '' : `<button class="btn btn-sm" type="button" data-promote="${escapeHtml(user.username)}">Promote</button>`}
+            ${user.username === dashboardData.user.username ? '' : `<button class="btn btn-sm btn-danger" type="button" data-delete-user="${escapeHtml(user.username)}">Hapus</button>`}
+          </div></td>
+        </tr>`).join('')
+      document.getElementById('admin-paste-rows').innerHTML = pastes.pastes.map(paste => `<tr>
+          <td><a href="/paste/${encodeURIComponent(paste.id)}"><strong>${escapeHtml(paste.title)}</strong></a><div class="muted"><span class="tag">${escapeHtml(paste.language)}</span></div></td>
+          <td>${escapeHtml(paste.author_username)}</td>
+          <td>${formatNumber(paste.views)}</td>
+          <td><button class="btn btn-sm btn-danger" type="button" data-admin-delete-paste="${escapeHtml(paste.id)}">Hapus</button></td>
+        </tr>`).join('')
+      document.querySelectorAll('[data-verify]').forEach(button => button.addEventListener('click', () => adminAction('/api/admin/verify-user', button.dataset.verify)))
+      document.querySelectorAll('[data-promote]').forEach(button => button.addEventListener('click', () => adminAction('/api/admin/promote-user', button.dataset.promote)))
+      document.querySelectorAll('[data-delete-user]').forEach(button => button.addEventListener('click', async () => {
+        if (!confirm(`Hapus user ${button.dataset.deleteUser} beserta semua paste?`)) return
+        try {
+          await api(`/api/admin/user/${encodeURIComponent(button.dataset.deleteUser)}`, { method: 'DELETE' })
+          toast('User dihapus', 'success')
+          loadAdmin()
+        } catch (error) { toast(error.message, 'error') }
+      }))
+      document.querySelectorAll('[data-admin-delete-paste]').forEach(button => button.addEventListener('click', async () => {
+        if (!confirm('Hapus paste ini?')) return
+        try {
+          await api(`/api/admin/paste/${encodeURIComponent(button.dataset.adminDeletePaste)}`, { method: 'DELETE' })
+          toast('Paste dihapus', 'success')
+          loadAdmin()
+        } catch (error) { toast(error.message, 'error') }
+      }))
+    } catch (error) { toast(error.message, 'error') }
+  }
+
+  async function adminAction(url, username) {
+    const data = new FormData()
+    data.append('username', username)
+    try {
+      const result = await api(url, { method: 'POST', body: data })
+      toast(result.message, 'success')
+      loadAdmin()
+    } catch (error) { toast(error.message, 'error') }
+  }
+
+  document.getElementById('profile-form').addEventListener('submit', async event => {
+    event.preventDefault()
+    try {
+      const result = await api('/api/profile/update', { method: 'POST', body: new FormData(event.currentTarget) })
+      if (result.new_token) CodeShare.auth.set(result.new_token)
+      toast(result.message, 'success')
+      loadDashboard()
+    } catch (error) { toast(error.message, 'error') }
+  })
+
+  document.getElementById('picture-form').addEventListener('submit', async event => {
+    event.preventDefault()
+    try {
+      await api('/api/profile-picture', { method: 'POST', body: new FormData(event.currentTarget) })
+      toast('Foto profil diperbarui', 'success')
+      loadDashboard()
+    } catch (error) { toast(error.message, 'error') }
+  })
+
+  document.getElementById('read-all').addEventListener('click', async () => {
+    try {
+      await api('/api/notifications/read-all', { method: 'POST' })
+      loadNotifications()
+    } catch (error) { toast(error.message, 'error') }
+  })
+
   loadDashboard()
-  document.getElementById('profile-form').addEventListener('submit', async e => {
-    e.preventDefault(); try { const result = await api('/api/profile/update',{method:'POST',body:new FormData(e.currentTarget)}); if(result.new_token) CodeShare.auth.set(result.new_token); toast(result.message,'success'); loadDashboard() } catch(error){toast(error.message,'error')}
-  })
-  document.getElementById('picture-form').addEventListener('submit', async e => {
-    e.preventDefault(); try { await api('/api/profile-picture',{method:'POST',body:new FormData(e.currentTarget)}); toast('Foto profil diperbarui','success'); loadDashboard() } catch(error){toast(error.message,'error')}
-  })
-  document.getElementById('read-all').addEventListener('click', async () => { try { await api('/api/notifications/read-all',{method:'POST'}); loadNotifications() } catch(e){toast(e.message,'error')} })
 })
 </script>
 {% endblock %}

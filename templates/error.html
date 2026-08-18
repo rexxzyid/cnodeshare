@@ -1,3 +1,14 @@
 {% extends "base.html" %}
 {% block title %}{{ status }} — CodeShare{% endblock %}
-{% block content %}<div class="shell auth-shell"><div class="card form-card" style="text-align:center"><div class="page-kicker">Error {{ status }}</div><h1 class="page-title">{{ message }}</h1><a class="btn btn-primary" href="/" style="margin-top:20px">Kembali ke home</a></div></div>{% endblock %}
+{% block content %}
+<div class="shell auth-shell">
+  <div class="card form-card" style="text-align:center">
+    <div class="page-kicker">Error {{ status }}</div>
+    <h1 class="page-title">{{ message }}</h1>
+    <div class="hero-actions" style="justify-content:center">
+      <a class="btn btn-primary" href="/">Kembali ke home</a>
+      <a class="btn" href="/search">Cari paste</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

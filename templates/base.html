@@ -3,30 +3,51 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#07080d">
+  <meta name="theme-color" content="#f2ecdd" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#14120f" media="(prefers-color-scheme: dark)">
   <title>{% block title %}CodeShare{% endblock %}</title>
-  <meta name="description" content="Platform cepat untuk membagikan kode, paste, dan diskusi.">
+  <meta name="description" content="{% block description %}Platform cepat untuk membagikan kode, paste, dan diskusi.{% endblock %}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='1.5' y='1.5' width='29' height='29' rx='7' fill='%23cdf24a' stroke='%2316130f' stroke-width='3'/><path d='M13 11l-4 5 4 5M19 11l4 5-4 5' fill='none' stroke='%2316130f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="/assets/app.css">
+  <script>
+    const stored = localStorage.getItem('theme')
+    if (stored) document.documentElement.dataset.theme = stored
+  </script>
   {% block head %}{% endblock %}
 </head>
 <body>
+  {% include "partials/icons.html" %}
   <header class="nav">
     <div class="shell nav-inner">
       <a class="brand" href="/"><span class="brand-mark">&lt;/&gt;</span><span>CodeShare</span></a>
-      <nav class="nav-links">
-        <a class="nav-link" href="/">Explore</a>
-        <a class="nav-link" href="/users">Users</a>
-        <a class="nav-link" href="/feed">Feed</a>
+      <nav class="nav-links" id="nav-links">
+        <a class="nav-link" href="/"><svg class="icon icon-sm"><use href="#i-code"></use></svg>Explore</a>
+        <a class="nav-link" href="/search"><svg class="icon icon-sm"><use href="#i-search"></use></svg>Search</a>
+        <a class="nav-link" href="/users"><svg class="icon icon-sm"><use href="#i-users"></use></svg>Users</a>
+        <a class="nav-link" href="/feed"><svg class="icon icon-sm"><use href="#i-feed"></use></svg>Feed</a>
+        <a class="nav-link menu-only" href="/create"><svg class="icon icon-sm"><use href="#i-plus"></use></svg>Buat paste</a>
+        <span class="nav-menu-slot" id="nav-menu-auth"></span>
       </nav>
       <div class="nav-actions">
-        <a class="btn btn-sm btn-primary mobile-essential" href="/create">+ Paste</a>
+        <button class="btn btn-sm btn-icon nav-toggle mobile-essential" id="nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false"><svg class="icon"><use href="#i-menu"></use></svg></button>
+        <button class="btn btn-sm btn-icon mobile-essential" id="theme-toggle" type="button" aria-label="Ganti tema"><svg class="icon" id="theme-icon"><use href="#i-moon"></use></svg></button>
+        <a class="btn btn-sm btn-primary" href="/create"><svg class="icon icon-sm"><use href="#i-plus"></use></svg>Paste</a>
         <div id="nav-auth"></div>
       </div>
     </div>
   </header>
   <main class="main">{% block content %}{% endblock %}</main>
   <footer class="footer">
-    <div class="shell footer-inner"><span>CodeShare · Node.js 22+</span><span>Share code, not friction.</span></div>
+    <div class="shell footer-inner">
+      <span><strong>CodeShare</strong> · Node.js 22+ · share code, not friction.</span>
+      <nav class="footer-links">
+        <a href="/">Explore</a>
+        <a href="/search">Search</a>
+        <a href="/users">Users</a>
+        <a href="/health">Health</a>
+      </nav>
+    </div>
   </footer>
   <div class="toast-wrap"></div>
   <script src="/assets/app.js" defer></script>

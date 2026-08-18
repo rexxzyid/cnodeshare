@@ -1,19 +1,58 @@
 {% extends "base.html" %}
+{% from "partials/badge.html" import badgeList, verifiedMark %}
 {% block title %}Users — CodeShare{% endblock %}
 {% block content %}
 <div class="shell">
-  <div class="page-head"><div><div class="page-kicker">Community</div><h1 class="page-title">People who share.</h1></div><div class="search-bar"><input class="input" id="user-search" placeholder="Cari username..."></div></div>
+  <div class="page-head">
+    <div>
+      <div class="page-kicker">Community</div>
+      <h1 class="page-title">Orang-orang<br>yang berbagi.</h1>
+      <p class="muted">{{ users | length }} akun terdaftar di instance ini.</p>
+    </div>
+    <div class="search-bar">
+      <input class="input" id="user-search" placeholder="Filter username..." autocomplete="off">
+    </div>
+  </div>
+
   <div class="grid grid-3" id="users-grid">
     {% for user in users %}
     <article class="card card-hover user-card" data-name="{{ user.username | lower }}">
-      <div class="user-card-top">{% if user.profile_picture %}<img class="avatar" src="{{ user.profile_picture }}" alt="">{% else %}<div class="avatar">{{ user.username | initial }}</div>{% endif %}<div><h3 style="margin:0"><a href="/user/{{ user.username }}">{{ user.username }}</a>{% if user.verified_by_admin %} <span style="color:var(--accent-2)">✓</span>{% endif %}</h3><div class="muted">{{ user.paste_count }} paste · {{ user.followers_count }} followers</div></div></div>
-      <div class="badges">{% for badge in user.badge_details %}<span class="badge" data-badge="{{ badge.key }}">{{ badge.icon }} {{ badge.name }}</span>{% endfor %}</div>
-      <div class="paste-foot"><span>Joined {{ user.created_at | day }}</span><a class="btn btn-sm" href="/user/{{ user.username }}">Profile</a></div>
+      <div class="user-card-top">
+        {% if user.profile_picture %}<img class="avatar" src="{{ user.profile_picture }}" alt="Avatar {{ user.username }}">{% else %}<div class="avatar">{{ user.username | initial }}</div>{% endif %}
+        <div>
+          <h3><a href="/user/{{ user.username }}">{{ user.username }}</a> {{ verifiedMark(user) }}</h3>
+          <div class="muted">{{ user.paste_count }} paste · {{ user.followers_count }} followers</div>
+        </div>
+      </div>
+      {{ badgeList(user.badge_details, 4) }}
+      <div class="paste-foot">
+        <span><svg class="icon icon-sm"><use href="#i-clock"></use></svg>{{ user.created_at | day }}</span>
+        <a class="btn btn-sm" href="/user/{{ user.username }}">Profile</a>
+      </div>
     </article>
+    {% else %}
+    <div class="empty"><strong>Belum ada user</strong>Daftar untuk menjadi yang pertama.</div>
     {% endfor %}
   </div>
+  <div class="empty" id="user-empty" hidden><strong>Tidak ada yang cocok</strong>Coba kata kunci lain.</div>
 </div>
 {% endblock %}
 {% block scripts %}
-<script>document.addEventListener('DOMContentLoaded',()=>document.getElementById('user-search').addEventListener('input',e=>{const q=e.target.value.toLowerCase().trim();document.querySelectorAll('.user-card').forEach(card=>card.hidden=q&&!card.dataset.name.includes(q))}))</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('user-search')
+  const cards = [...document.querySelectorAll('.user-card')]
+  const empty = document.getElementById('user-empty')
+  input.addEventListener('input', () => {
+    const query = input.value.trim().toLowerCase()
+    let visible = 0
+    cards.forEach(card => {
+      const match = !query || card.dataset.name.includes(query)
+      card.hidden = !match
+      if (match) visible += 1
+    })
+    empty.hidden = visible > 0
+  })
+})
+</script>
 {% endblock %}

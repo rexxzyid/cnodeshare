@@ -2,14 +2,18 @@
 {% block title %}{{ paste.title }} — CodeShare{% endblock %}
 {% block content %}
 <div class="shell paste-layout">
-  <section class="paste-main card" style="padding:0;overflow:hidden">
+  <section class="paste-main card">
     <div class="paste-header">
-      <div class="paste-meta"><span class="tag">{{ paste.language }}</span><a href="/user/{{ paste.author_username }}">oleh {{ paste.author_username }}</a><span>·</span><span>{{ paste.created_at | date }}</span></div>
+      <div class="paste-meta">
+        <span class="tag">{{ paste.language }}</span>
+        <a href="/user/{{ paste.author_username }}">oleh {{ paste.author_username }}</a>
+        <span><svg class="icon icon-sm"><use href="#i-clock"></use></svg> {{ paste.created_at | date }}</span>
+      </div>
       <h1>{{ paste.title }}</h1>
       <div class="actions">
-        <button class="btn btn-sm" id="copy-code">Copy code</button>
-        <button class="btn btn-sm" id="copy-link">Copy link</button>
-        <a class="btn btn-sm" id="edit-link" href="/edit/{{ paste.id }}" hidden>Edit</a>
+        <button class="btn btn-sm" id="copy-code" type="button"><svg class="icon icon-sm"><use href="#i-copy"></use></svg>Copy code</button>
+        <button class="btn btn-sm" id="copy-link" type="button"><svg class="icon icon-sm"><use href="#i-link"></use></svg>Copy link</button>
+        <a class="btn btn-sm btn-accent" id="edit-link" href="/edit/{{ paste.id }}" hidden><svg class="icon icon-sm"><use href="#i-pen"></use></svg>Edit</a>
       </div>
     </div>
     <pre class="code-block" id="code-content">{{ paste.content }}</pre>
@@ -17,39 +21,52 @@
 
   <aside class="side-stack">
     <div class="card side-card">
-      <h3>Detail</h3>
+      <h3>Author</h3>
       <div class="user-line">
-        {% if paste.author_profile_picture %}<img class="avatar" src="{{ paste.author_profile_picture }}" alt="">{% else %}<div class="avatar">{{ paste.author_username | initial }}</div>{% endif %}
-        <div><a href="/user/{{ paste.author_username }}"><strong>{{ paste.author_username }}</strong></a><div class="muted">Author</div></div>
+        {% if paste.author_profile_picture %}<img class="avatar" src="{{ paste.author_profile_picture }}" alt="Avatar {{ paste.author_username }}">{% else %}<div class="avatar">{{ paste.author_username | initial }}</div>{% endif %}
+        <div>
+          <a href="/user/{{ paste.author_username }}"><strong>{{ paste.author_username }}</strong></a>
+          <div class="muted">Lihat semua paste publik</div>
+        </div>
       </div>
-      <div class="stats" style="grid-template-columns:1fr 1fr;margin:16px 0 0">
+      <button class="btn btn-block" id="follow-btn" data-user="{{ paste.author_username }}" style="margin-top:16px" hidden>Follow</button>
+    </div>
+
+    <div class="card side-card">
+      <h3>Statistik</h3>
+      <div class="stats" style="grid-template-columns:1fr 1fr;margin:0">
         <div class="stat"><strong id="view-count">{{ paste.views }}</strong><span>Views</span></div>
         <div class="stat"><strong>{{ threads | length }}</strong><span>Replies</span></div>
       </div>
-      <button class="btn btn-block" id="follow-btn" data-user="{{ paste.author_username }}" hidden>Follow</button>
     </div>
 
     {% if paste.language == 'javascript' %}
     <div class="card side-card">
       <h3>JavaScript runner</h3>
-      <p class="muted" style="font-size:12px;margin-bottom:10px">Runner server dinonaktifkan secara default dan harus diaktifkan lewat konfigurasi.</p>
-      <button class="btn btn-sm" id="run-code">Run</button>
-      <pre class="runner-output" id="runner-output" style="margin-top:10px">Output akan tampil di sini.</pre>
+      <p class="muted" style="font-size:12px;margin-bottom:12px">Runner dinonaktifkan secara default dan hanya aktif jika server mengizinkan.</p>
+      <button class="btn btn-sm" id="run-code" type="button"><svg class="icon icon-sm"><use href="#i-play"></use></svg>Run</button>
+      <pre class="runner-output" id="runner-output" style="margin-top:12px">Output akan tampil di sini.</pre>
     </div>
     {% endif %}
   </aside>
 </div>
 
-<div class="shell section" style="max-width:860px">
+<div class="shell section" style="max-width:900px">
   <div class="section-head"><div><div class="page-kicker">Discussion</div><h2>Thread</h2></div></div>
   <div class="card">
     <form id="thread-form" data-paste-id="{{ paste.id }}">
       <div class="field"><textarea class="textarea textarea-sm" name="content" maxlength="5000" placeholder="Tulis komentar..."></textarea></div>
       <div class="form-actions"><button class="btn btn-primary" type="submit">Kirim komentar</button></div>
     </form>
-    <div style="margin-top:18px">
+    <div style="margin-top:22px">
       {% for thread in threads %}
-      <article class="comment"><div class="comment-head"><a href="/user/{{ thread.author_username }}"><strong>{{ thread.author_username }}</strong></a><span class="muted">{{ thread.created_at | date }}</span></div><div class="comment-body">{{ thread.content }}</div></article>
+      <article class="comment">
+        <div class="comment-head">
+          <a href="/user/{{ thread.author_username }}"><strong>{{ thread.author_username }}</strong></a>
+          <span class="muted">{{ thread.created_at | date }}</span>
+        </div>
+        <div class="comment-body">{{ thread.content }}</div>
+      </article>
       {% else %}
       <div class="empty"><strong>Belum ada komentar</strong>Jadilah yang pertama membuka diskusi.</div>
       {% endfor %}
@@ -60,26 +77,65 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
-  const me = await CodeShare.auth.me(); const author = {{ paste.author_username | json | safe }}
+  const author = {{ paste.author_username | json | safe }}
+  const pasteId = {{ paste.id | json | safe }}
+  const me = await CodeShare.auth.me()
   if (me?.username === author || me?.is_admin) document.getElementById('edit-link').hidden = false
+
   if (me && me.username !== author) {
-    const button = document.getElementById('follow-btn'); button.hidden = false
-    try { const state = await api(`/api/follow/${encodeURIComponent(author)}/status`); button.textContent = state.following ? 'Unfollow' : 'Follow'; button.dataset.following = state.following }
-    catch {}
-    button.addEventListener('click', async () => { try { const state = await api(`/api/follow/${encodeURIComponent(author)}`, { method:'POST' }); button.textContent = state.following ? 'Unfollow' : 'Follow'; toast(state.following ? 'User di-follow' : 'Follow dibatalkan', 'success') } catch(e) { toast(e.message,'error') } })
+    const button = document.getElementById('follow-btn')
+    const label = following => following ? 'Unfollow' : 'Follow'
+    button.hidden = false
+    try {
+      const state = await api(`/api/follow/${encodeURIComponent(author)}/status`)
+      button.textContent = label(state.following)
+    } catch {}
+    button.addEventListener('click', async () => {
+      try {
+        const state = await api(`/api/follow/${encodeURIComponent(author)}`, { method: 'POST' })
+        button.textContent = label(state.following)
+        toast(state.following ? `Mengikuti ${author}` : `Berhenti mengikuti ${author}`, 'success')
+      } catch (error) { toast(error.message, 'error') }
+    })
   }
-  document.getElementById('copy-code').addEventListener('click', async () => { await navigator.clipboard.writeText(document.getElementById('code-content').textContent); toast('Kode disalin','success') })
-  document.getElementById('copy-link').addEventListener('click', async () => { await navigator.clipboard.writeText(location.href); toast('Link disalin','success') })
-  document.getElementById('thread-form').addEventListener('submit', async e => {
-    e.preventDefault(); if (!CodeShare.auth.token()) return location.href='/login'; const form = e.currentTarget; const data = new FormData(form); data.append('paste_id', form.dataset.pasteId)
-    try { await api('/api/thread', { method:'POST', body:data }); location.reload() } catch(err) { toast(err.message,'error') }
+
+  document.getElementById('copy-code').addEventListener('click', async () => {
+    await navigator.clipboard.writeText(document.getElementById('code-content').textContent)
+    toast('Kode disalin', 'success')
   })
+  document.getElementById('copy-link').addEventListener('click', async () => {
+    await navigator.clipboard.writeText(location.href)
+    toast('Link disalin', 'success')
+  })
+
+  document.getElementById('thread-form').addEventListener('submit', async event => {
+    event.preventDefault()
+    if (!CodeShare.auth.token()) return location.href = '/login'
+    const form = event.currentTarget
+    const data = new FormData(form)
+    data.append('paste_id', form.dataset.pasteId)
+    try {
+      await api('/api/thread', { method: 'POST', body: data })
+      location.reload()
+    } catch (error) { toast(error.message, 'error') }
+  })
+
   document.getElementById('run-code')?.addEventListener('click', async () => {
-    const output = document.getElementById('runner-output'); output.textContent = 'Running...'
-    try { const result = await api('/api/run-code', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ code:document.getElementById('code-content').textContent, language:'javascript' }) }); output.textContent = result.output || '(no output)' }
-    catch(e) { output.textContent = e.message }
+    const output = document.getElementById('runner-output')
+    output.textContent = 'Running...'
+    try {
+      const result = await api('/api/run-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: document.getElementById('code-content').textContent, language: 'javascript' })
+      })
+      output.textContent = result.output || '(no output)'
+    } catch (error) { output.textContent = error.message }
   })
-  addEventListener('codeshare:view', e => { if (e.detail.paste_id === {{ paste.id | json | safe }}) document.getElementById('view-count').textContent = e.detail.views })
+
+  addEventListener('codeshare:view', event => {
+    if (event.detail.paste_id === pasteId) document.getElementById('view-count').textContent = formatNumber(event.detail.views)
+  })
 })
 </script>
 {% endblock %}

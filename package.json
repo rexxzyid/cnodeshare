@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "check": "node --check src/server.js && node --check src/store.js && node --check src/security.js && node --check src/realtime.js && node --check src/executor.js"
+    "check": "node --check src/server.js && node --check src/store.js && node --check src/security.js && node --check src/realtime.js && node --check src/executor.js && node --check src/cloudflare.js && node --check src/config.js && node --check public/app.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

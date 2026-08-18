@@ -19,6 +19,7 @@ import {
 import { hashPassword, verifyPassword, createToken, optionalUser, requireUser, requireAdmin } from './security.js'
 import { initRealtime, sendToUser, broadcast } from './realtime.js'
 import { executeCode } from './executor.js'
+import { cloudflareAccess, cloudflareStatus } from './cloudflare.js'
 
 await initStore()
 await ensureAdmin()
@@ -69,6 +70,8 @@ env.addFilter('day', value => {
 env.addFilter('initial', value => String(value || '?').slice(0, 1).toUpperCase())
 env.addFilter('json', value => JSON.stringify(value))
 app.set('view engine', 'html')
+
+app.use(cloudflareAccess())
 
 const apiLimiter = rateLimit({ windowMs: 60_000, limit: 180, standardHeaders: 'draft-7', legacyHeaders: false })
 const authLimiter = rateLimit({ windowMs: 60_000, limit: 20, standardHeaders: 'draft-7', legacyHeaders: false })
@@ -138,10 +141,11 @@ async function renderPaste(req, res, pasteId) {
 
 app.get('/health', async (req, res) => {
   const stats = await platformStats()
-  res.json({ status: 'healthy', runtime: `node ${process.version}`, storage: 'json_files', ...stats })
+  res.json({ status: 'healthy', runtime: `node ${process.version}`, storage: 'json_files', cloudflare: cloudflareStatus(), ...stats })
 })
 
 app.get('/', (req, res) => res.render('index.html'))
+app.get('/search', (req, res) => res.render('search.html'))
 app.get('/login', (req, res) => res.render('login.html'))
 app.get('/signup', (req, res) => res.render('signup.html'))
 app.get('/create', (req, res) => res.render('create.html'))
@@ -280,7 +284,7 @@ app.get('/api/dashboard', requireUser, async (req, res) => {
   const badges = await calculateBadges(req.user.username)
   res.json({
     user: {
-      username: req.user.username, email: req.user.email, badges, verified_by_admin: Boolean(req.user.verified_by_admin),
+      username: req.user.username, email: req.user.email, badges, badge_details: badges.map(badgeInfo), verified_by_admin: Boolean(req.user.verified_by_admin),
       is_admin: Boolean(req.user.is_admin), profile_picture: req.user.profile_picture || null, name: req.user.name || ''
     },
     pastes: pastes.map(p => ({ id: p.id, title: p.title, language: p.language, views: Number(p.views || 0), created_at: p.created_at, is_private: Boolean(p.is_private) })),
@@ -541,4 +545,6 @@ app.use((error, req, res, next) => {
 initRealtime(server)
 server.listen(config.port, config.host, () => {
   console.log(`CodeShare Node.js ${process.version} running at http://${config.host}:${config.port}`)
+  console.log(`Public base URL: ${config.publicBaseUrl}`)
+  if (config.cfAccessEnabled) console.log(`Cloudflare Access active for: ${config.cfAccessProtectedPaths.join(', ')}`)
 })

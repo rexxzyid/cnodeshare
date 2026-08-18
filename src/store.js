@@ -200,18 +200,18 @@ export function isExpired(paste) {
 
 export function badgeInfo(badge) {
   const map = {
-    newcomer: { name: 'Newcomer', icon: '🌱', verified: false },
-    member: { name: 'Member', icon: '👤', verified: false },
-    verified: { name: 'Verified', icon: '✓', verified: true },
-    pro: { name: 'Pro', icon: '★', verified: false },
-    expert: { name: 'Expert', icon: '🏆', verified: false },
-    legend: { name: 'Legend', icon: '👑', verified: false },
-    popular: { name: 'Popular', icon: '🔥', verified: false },
-    prolific: { name: 'Prolific', icon: '✎', verified: false },
-    admin: { name: 'Admin', icon: '◆', verified: true },
-    google_user: { name: 'Google', icon: 'G', verified: true }
+    newcomer: { name: 'Newcomer', icon: 'sprout', description: 'Akun baru bergabung', verified: false },
+    member: { name: 'Member', icon: 'user', description: 'Sudah aktif membagikan paste', verified: false },
+    verified: { name: 'Verified', icon: 'shield', description: 'Identitas diverifikasi admin', verified: true },
+    pro: { name: 'Pro', icon: 'star', description: '15 paste dengan 2.000+ views', verified: false },
+    expert: { name: 'Expert', icon: 'trophy', description: '25 paste dengan 5.000+ views', verified: false },
+    legend: { name: 'Legend', icon: 'crown', description: '50 paste dengan 10.000+ views', verified: false },
+    popular: { name: 'Popular', icon: 'flame', description: 'Total views di atas 1.000', verified: false },
+    prolific: { name: 'Prolific', icon: 'pen', description: 'Sudah membuat 10 paste', verified: false },
+    admin: { name: 'Admin', icon: 'bolt', description: 'Pengelola platform', verified: true },
+    google_user: { name: 'Google', icon: 'globe', description: 'Masuk lewat akun Google', verified: true }
   }
-  return { key: badge, ...(map[badge] || { name: String(badge), icon: '•', verified: false }) }
+  return { key: badge, ...(map[badge] || { name: String(badge), icon: 'star', description: '', verified: false }) }
 }
 
 export function calculateBadgesFor(user, pastes = []) {
